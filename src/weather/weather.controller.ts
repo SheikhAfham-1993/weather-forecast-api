@@ -1,18 +1,26 @@
-import { Controller, Get, Req } from '@nestjs/common';
+import { Controller, Get, HttpException, Param } from '@nestjs/common';
 import { WeatherService } from './weather.service';
 
-
-@Controller("weather")
+@Controller('weather')
 export class WeatherController {
   constructor(private weatherService: WeatherService) {}
 
-  @Get('/getWeather')
-  getWeatherData(@Req() req) {
-    return this.weatherService.getWeatherData(req.body.city);
+  @Get('/getWeather/:city')
+  async getWeatherData(@Param('city') city: string) {
+    try {
+      return await this.weatherService.getWeatherData(city);
+    } catch (error) {
+      throw new HttpException(error, error.response.status);
+    }
   }
 
-  @Get('/getHistoricalWeather')
-  getHistoricalWeather(@Req() req) {
-    return this.weatherService.getHistoricalWeather();
+  @Get('/getWeatherForecast/:city')
+  async getWeatherForecast(@Param('city') city) {
+    try {
+      const response = await this.weatherService.getWeatherForecast(city);
+      return response;
+    } catch (error) {
+      throw new HttpException(error, error.response.status);
+    }
   }
 }
